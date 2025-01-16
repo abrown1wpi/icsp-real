@@ -1,0 +1,35 @@
+.pinFollow{
+  width: 4%;
+  height: 8%;
+  z-index: 1;
+}
+
+.topMenu li{
+  display: inline;
+  color: #ffffff;
+  padding: 0.5em;
+  font-size: 12;
+  font-family:Georgia, 'Times New Roman', Times, serif;
+}
+
+.topMenu ul{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
+  background-color:darkturquoise;
+}
+
+body{
+  background-color: #15212b;
+  overflow: hidden;
+}
+
+.mapRule img{
+  height:100%;
+  width: auto;
+}
+
+.mapRule div{
+  width: 100%;
+}
