@@ -1,7 +1,16 @@
 .pinFollow{
-  width: 4%;
-  height: 8%;
+  width: 1vw;
+  height: auto;
   z-index: 1;
+}
+
+.pinButton {
+  z-index: 1;
+  position: fixed;
+  width: 4vw;
+  height: auto;
+  bottom: 2%;
+  left: 2%;
 }
 
 .topMenu li{
@@ -25,11 +34,12 @@ body{
   overflow: hidden;
 }
 
-.mapRule img{
-  height:100%;
-  width: auto;
+.imgMapRule{
+  height: 100%;
+  width: 80%;
 }
 
 .mapRule div{
-  width: 100%;
+  width: auto;
+  height: 90vh;
 }
