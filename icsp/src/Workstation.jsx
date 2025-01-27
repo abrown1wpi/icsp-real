@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import './App.css';
 import map from './assets/mapRS.jpg'
 import pin from './assets/locatePin.png'
+import PinObj from './PinObj';
 
 const PinButton = ({onClick}) => {
     return(
@@ -42,9 +43,15 @@ const FollowPinObj = ({onClick}) => {
 
 const Workstation = () => {
     const [followPins, setFollowPins] = useState([]);
+    const [pins, setPins] = useState([]);
 
     const createFollowPin = () => {
-        setFollowPins([...followPins, <FollowPinObj key={followPins.length}></FollowPinObj>])
+        setFollowPins([...followPins, <FollowPinObj key={followPins.length} onClick={createPin}></FollowPinObj>])
+    }
+
+    const createPin = (mousePosition) => {
+      setPins([...pins, <PinObj key={pins.length} x={mousePosition.x} y={mousePosition.y}></PinObj>])
+      setFollowPins([])
     }
 
     return (
@@ -52,6 +59,7 @@ const Workstation = () => {
             <img src={map} alt="map" className="imgMapRule"/>
             <PinButton onClick={createFollowPin}></PinButton>
             {followPins}
+            {pins}
         </div>
 
     )
