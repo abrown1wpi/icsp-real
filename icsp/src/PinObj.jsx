@@ -1,9 +1,8 @@
 import pin from './assets/locatePin.png';
+import {useState} from 'react'
 import './App.css';
 
-const PopUp = ({name, docs, onCLick}) => {
-  // Pin name
-  // Upload docs
+const PopUp = ({name, docs, onClick}) => {
   const componentStyle = {
     position: 'absolute',
     zIndex: 2,
@@ -29,12 +28,13 @@ const PopUp = ({name, docs, onCLick}) => {
   return(
     <div style={componentStyle}>
       <p style={pStyle}>{name}</p>
-      <p style={xStyle} onCLick={onCLick}>x</p>
+      <p style={xStyle} onClick={onClick}>x</p>
     </div>
   );
 }
 
 export default function PinObj({x, y}){
+  const [showPopUp, setShowPopUp] = useState(false);
   const componentStyle = {
     position: 'absolute',
     left: x,
@@ -44,8 +44,8 @@ export default function PinObj({x, y}){
   
   return (
     <div style={componentStyle}>
-      <PopUp name="you"></PopUp>
-      <img src={pin} alt='pin' className='pinFollow'></img>
+      {(showPopUp)? <PopUp name="you" onClick={() => setShowPopUp(false)}></PopUp>: <></>}
+      <img src={pin} alt='pin' className='pinFollow' onClick={() => setShowPopUp(true)}></img>
     </div>
   );
 }
