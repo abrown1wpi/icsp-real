@@ -40,6 +40,5 @@ body{
 }
 
 .mapRule div{
-  width: auto;
-  height: 90vh;
+  width: 80vh;
 }

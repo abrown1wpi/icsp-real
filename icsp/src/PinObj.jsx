@@ -1,8 +1,8 @@
 import pin from './assets/locatePin.png';
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import './App.css';
 
-const PopUp = ({name, docs, onClick}) => {
+const PopUp = ({onClick, id, supabase}) => {
   const componentStyle = {
     position: 'absolute',
     zIndex: 2,
@@ -18,23 +18,46 @@ const PopUp = ({name, docs, onClick}) => {
   }
 
   const xStyle = {
-    fontFamily: 'arial',
+    fontFamily: 'helvetica',
     position: 'absolute',
     left: '90%',
     top: '-20%',
     fontSize: '0.7em',
   }
+  const [pinName, setPinName] = useState("");
+
+  // Fetch the pin name when component loads
+  useEffect(() => {
+    const fetchPinName = async () => {
+      const { data, error } = await supabase.from("Pins").select("Pin_Name").eq("id", id).single();
+      if (error) {
+        console.error("Error fetching pin name:", error);
+      } else {
+        setPinName(data.Pin_Name || ""); // Set default empty string if null
+      }
+    };
+    fetchPinName();
+  }, [id, supabase]);
+
+  // Update Supabase when user finishes editing (onBlur)
+  const handleBlur = async () => {
+    const { error } = await supabase.from("Pins").update({ Pin_Name: pinName }).eq("id", id);
+    if (error) {
+      console.error("Error updating pin name:", error);
+    }
+  };
 
   return(
     <div style={componentStyle}>
-      <p style={pStyle}>{name}</p>
+      <input style={pStyle} type="text" placeholder="Enter pin name" value={pinName} onChange={(e) => setPinName(e.target.value)} onBlur={handleBlur}></input>
       <p style={xStyle} onClick={onClick}>x</p>
     </div>
   );
 }
 
-export default function PinObj({x, y}){
-  const [showPopUp, setShowPopUp] = useState(false);
+export default function PinObj({supabase, x, y, id}){
+  const [showPopUp, setShowPopUp] = useState(true);
+
   const componentStyle = {
     position: 'absolute',
     left: x,
@@ -44,7 +67,7 @@ export default function PinObj({x, y}){
   
   return (
     <div style={componentStyle}>
-      {(showPopUp)? <PopUp name="you" onClick={() => setShowPopUp(false)}></PopUp>: <></>}
+      {(showPopUp)? <PopUp id={id} supabase={supabase} onClick={() => setShowPopUp(false)}></PopUp>: <></>}
       <img src={pin} alt='pin' className='pinFollow' onClick={() => setShowPopUp(true)}></img>
     </div>
   );

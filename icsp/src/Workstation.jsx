@@ -4,6 +4,8 @@ import map from './assets/mapRS.jpg'
 import pin from './assets/locatePin.png'
 import PinObj from './PinObj';
 
+// ... supabase stuff
+
 const PinButton = ({onClick}) => {
     return(
         <img src={pin} alt='pin button' className='pinButton' onClick={onClick}></img>
@@ -41,7 +43,7 @@ const FollowPinObj = ({onClick}) => {
       );
 }
 
-const Workstation = () => {
+const Workstation = ({supabase}) => {
     const [followPins, setFollowPins] = useState([]);
     const [pins, setPins] = useState([]);
 
@@ -50,8 +52,17 @@ const Workstation = () => {
     }
 
     const createPin = (mousePosition) => {
-      setPins([...pins, <PinObj key={pins.length} x={mousePosition.x} y={mousePosition.y}></PinObj>])
-      setFollowPins([])
+      const { x, y } = mousePosition;
+
+      supabase.from("Pins").insert({
+        "Pin_Name": "",
+        "Attached_Files": [],
+      }).select().then((result) => {
+        console.log(result);
+        setPins([...pins, <PinObj supabase={supabase} key={pins.length} x={x} y={y} id={result.data[0].id}></PinObj>])
+      });
+
+      setFollowPins([]);
     }
 
     return (
