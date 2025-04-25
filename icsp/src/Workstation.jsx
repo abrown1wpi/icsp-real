@@ -4,8 +4,6 @@ import map from './assets/mapRS.jpg'
 import pin from './assets/locatePin.png'
 import PinObj from './PinObj';
 
-// ... supabase stuff
-
 const PinButton = ({onClick}) => {
     return(
         <img src={pin} alt='pin button' className='pinButton' onClick={onClick}></img>
@@ -43,9 +41,24 @@ const FollowPinObj = ({onClick}) => {
       );
 }
 
-const Workstation = ({supabase}) => {
+const Workstation = ({supabase, mapId, sendPinID, pinUpdate}) => {
     const [followPins, setFollowPins] = useState([]);
     const [pins, setPins] = useState([]);
+    const [pinIDs, setPinIDs] = useState([]);
+    const [mapImage, setMapImage] = useState(map);
+    useEffect(() => {
+      
+      const fetchMap = async () => {
+        if (!mapId) return;
+        
+        const { data, error } = await supabase.from("Maps").select().eq('id', mapId).single();
+        if (data && data.file) {
+          setMapImage(data.file);
+        }
+      };
+      fetchMap();
+    }, [mapId]);
+    
 
     const createFollowPin = () => {
         setFollowPins([...followPins, <FollowPinObj key={followPins.length} onClick={createPin}></FollowPinObj>])
@@ -57,17 +70,21 @@ const Workstation = ({supabase}) => {
       supabase.from("Pins").insert({
         "Pin_Name": "",
         "Attached_Files": [],
+        "Map_ID": mapId,
       }).select().then((result) => {
-        console.log(result);
-        setPins([...pins, <PinObj supabase={supabase} key={pins.length} x={x} y={y} id={result.data[0].id}></PinObj>])
+        setPins([...pins, <PinObj mapID={mapId} pinUpdate={pinUpdate} supabase={supabase} key={pins.length} x={x} y={y} id={result.data[0].id}></PinObj>])
+        setPinIDs([...pinIDs, result.data[0].id])
+        sendPinID(result.data[0].id);
+        console.log(result.data[0].id);
       });
 
       setFollowPins([]);
+      
     }
 
     return (
         <div className="mapRule">
-            <img src={map} alt="map" className="imgMapRule"/>
+            <img src={mapImage} alt="map" className="imgMapRule"/>
             <PinButton onClick={createFollowPin}></PinButton>
             {followPins}
             {pins}

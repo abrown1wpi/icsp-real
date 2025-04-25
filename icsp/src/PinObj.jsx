@@ -2,7 +2,7 @@ import pin from './assets/locatePin.png';
 import {useState, useEffect} from 'react'
 import './App.css';
 
-const PopUp = ({onClick, id, supabase}) => {
+const PopUp = ({onClick, id, supabase, pinUpdate}) => {
   const componentStyle = {
     position: 'absolute',
     zIndex: 2,
@@ -42,6 +42,8 @@ const PopUp = ({onClick, id, supabase}) => {
   // Update Supabase when user finishes editing (onBlur)
   const handleBlur = async () => {
     const { error } = await supabase.from("Pins").update({ Pin_Name: pinName }).eq("id", id);
+    pinUpdate();
+    console.log("Ran");
     if (error) {
       console.error("Error updating pin name:", error);
     }
@@ -55,8 +57,28 @@ const PopUp = ({onClick, id, supabase}) => {
   );
 }
 
-export default function PinObj({supabase, x, y, id}){
+export default function PinObj({supabase, x, y, id, pinUpdate, mapID}){
   const [showPopUp, setShowPopUp] = useState(true);
+
+  useEffect(()=>{
+    const updateMap = async () => {
+      const response = (await supabase.from("Maps").select("pins").eq("id", mapID).single()).data.pins;
+      console.log(`RESPONSE: ${JSON.stringify(response)}`);
+      const newPin = [...response, id];
+      console.log(newPin);
+
+      const { error } = await supabase.from("Maps").update({ pins: newPin }).eq("id", mapID);
+      if (error) {
+        console.error("Error updating map pin list:", error);
+      }
+    }
+
+    updateMap()
+
+    return () => {
+      console.log("Component destroyed");
+    }
+  },[])
 
   const componentStyle = {
     position: 'absolute',
@@ -67,7 +89,7 @@ export default function PinObj({supabase, x, y, id}){
   
   return (
     <div style={componentStyle}>
-      {(showPopUp)? <PopUp id={id} supabase={supabase} onClick={() => setShowPopUp(false)}></PopUp>: <></>}
+      {(showPopUp)? <PopUp id={id} pinUpdate={pinUpdate} supabase={supabase} onClick={() => setShowPopUp(false)}></PopUp>: <></>}
       <img src={pin} alt='pin' className='pinFollow' onClick={() => setShowPopUp(true)}></img>
     </div>
   );
